@@ -34,6 +34,10 @@ const studentController = {
       res.status(400).json({ error: 'Grade is required and must be a number.' })
       return
     }
+    if (grade > 10 || grade < 0) {
+      res.status(400).json({ error: 'Grade must be between 0 and 10.' })
+      return
+    }
 
     try {
       const lastStudent = await studentService.getLastStudent()
