@@ -10,12 +10,20 @@ const studentService = {
     return prisma.student.findUnique({ where: { id } })
   },
 
-  async createStudent(data: { id: number; name: string; grade: number }): Promise<Student> {
+  async createStudent(data: {
+    id: number
+    name: string
+    grade: number
+  }): Promise<Student> {
     return prisma.student.create({ data })
   },
 
   async getLastStudent(): Promise<Student | null> {
     return prisma.student.findFirst({ orderBy: { id: 'desc' } })
+  },
+
+  async deleteStudent(id: number): Promise<Student> {
+    return prisma.student.delete({ where: { id } })
   }
 }
 

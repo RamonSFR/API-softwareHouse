@@ -43,6 +43,21 @@ const studentController = {
     } catch (error) {
       res.status(500).json({ error: 'Failed to create student.' })
     }
+  },
+
+  async deleteStudent(req: Request, res: Response): Promise<void> {
+    const id: number = parseInt(req.params.id, 10)
+    if (isNaN(id) || id <= 0) {
+      res.status(400).json({ error: 'Invalid ID. Must be a positive integer.' })
+      return
+    }
+
+    try {
+      await studentService.deleteStudent(id)
+      res.status(204).send()
+    } catch (error) {
+      res.status(404).json({ error: 'User not found' })
+    }
   }
 }
 
