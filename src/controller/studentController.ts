@@ -2,16 +2,37 @@ import { Request, Response } from 'express'
 import studentService from '../service/studentService'
 import { Student } from '../generated/prisma'
 
+function getFirstNonRepeatingLetter(name: string): string {
+  const lower = name.toLowerCase()
+  const counts: Record<string, number> = {}
+  for (const char of lower) {
+    if (/[a-z]/.test(char)) {
+      counts[char] = (counts[char] || 0) + 1
+    }
+  }
+  for (const char of lower) {
+    if (/[a-z]/.test(char) && counts[char] === 1) {
+      return char
+    }
+  }
+  return '_'
+}
+
 const studentController = {
   async getAllStudents(req: Request, res: Response): Promise<void> {
     const students: Student[] = await studentService.getAllStudents()
-    res.json(students)
+    const result = students.map(student => ({
+      ...student,
+      firstNonRepeatingLetter: getFirstNonRepeatingLetter(student.name)
+    }))
+    res.json(result)
   },
 
   async getStudentById(req: Request, res: Response): Promise<void> {
     const id: number = parseInt(req.params.id, 10)
     if (isNaN(id) || id <= 0) {
       res.status(400).json({ error: 'Invalid ID. Must be a positive integer.' })
+      return
     }
 
     const student: Student | null = await studentService.getStudentById(id)
@@ -20,7 +41,10 @@ const studentController = {
       return
     }
 
-    res.json(student)
+    res.json({
+      ...student,
+      firstNonRepeatingLetter: getFirstNonRepeatingLetter(student.name)
+    })
   },
 
   async createStudent(req: Request, res: Response): Promise<void> {
